@@ -13,6 +13,8 @@ var gameOver, gameOverImage,restart,restartImage;
 
 var jumpSong, deathSong, pointSong;
 
+var mensagem = "Na minha cidade não para de chover";
+
 function preload(){
   trex_running = loadAnimation("trex1.png","trex3.png","trex4.png");
   trex_collided = loadAnimation("trex_collided.png");
@@ -38,6 +40,11 @@ function preload(){
 function setup() {
   createCanvas(600, 200);
   
+  ground = createSprite(200,180,400,20);
+  ground.addImage("ground",groundImage);
+  ground.x = ground.width /2;
+  ground.velocityX = -4;
+
   trex = createSprite(50,180,20,50);
   trex.addAnimation("running", trex_running);
   trex.addAnimation("collided" , trex_collided)
@@ -45,10 +52,7 @@ function setup() {
   trex.debug = false;
   trex.setCollider("circle", 0, 0, 40);
   
-  ground = createSprite(200,180,400,20);
-  ground.addImage("ground",groundImage);
-  ground.x = ground.width /2;
-  ground.velocityX = -4;
+  
   
   invisibleGround = createSprite(200,190,400,10);
   invisibleGround.visible = false;
@@ -57,7 +61,7 @@ function setup() {
   obstaclesGroup = new Group();
   cloudsGroup = new Group();
   
-  console.log("Hello" + 5);
+  //console.log("Hello" + 5);
   
   score = 0;
 
@@ -66,19 +70,21 @@ function setup() {
   restart = createSprite(300,150);
   restart.scale = 0.5
   restart.addImage(restartImage);
+  
 }
 
 function draw() {
   background(180);
-  text("Score: "+ score, 500,50);
+ 
+  //console.log(mensagem);
   
   
   if(gameState === PLAY){
     //mover o solo
-    ground.velocityX = -(4 + score / 100);
-    score = score + Math.round(frameCount/60);
-    if(keyDown("space")&& trex.y >= 100) {
-      trex.velocityY = -13;
+    ground.velocityX = -(5.5 +4* score / 100);
+    score = score + Math.round(frameRate()/60);
+    if(keyDown("space")&& trex.y >= 150) {
+      trex.velocityY = -10;
       jumpSong.play();
     }
     trex.velocityY = trex.velocityY + 0.8
@@ -111,6 +117,9 @@ function draw() {
     cloudsGroup.setLifetimeEach(-1);
     obstaclesGroup.setLifetimeEach(-1);
     trex.velocityY = 0;
+    if(mousePressedOver(restart)){
+      reset();
+    }
   }
   
   
@@ -128,12 +137,22 @@ function draw() {
  
   
   drawSprites();
+  text("Score: "+ score, 500,50);
+}
+
+function reset(){
+  gameState = PLAY;
+  cloudsGroup.destroyEach();
+  obstaclesGroup.destroyEach();
+  trex.changeAnimation("running");
+  score = 0;
+
 }
 
 function spawnObstacles(){
  if (frameCount % 60 === 0){
    var obstacle = createSprite(600,165,10,40);
-   obstacle.velocityX = -(6+score /100);
+   obstacle.velocityX = -(6+4*score /100);
 
    
     // //gerar obstáculos aleatórios
